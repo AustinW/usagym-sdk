@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use AustinW\UsaGym\Data\AthleteReservation;
 use AustinW\UsaGym\Enums\Discipline;
+use AustinW\UsaGym\Enums\Gender;
 use AustinW\UsaGym\Enums\MemberStatus;
 use AustinW\UsaGym\Enums\MemberType;
 
@@ -124,6 +125,38 @@ describe('AthleteReservation', function () {
             $athlete = AthleteReservation::fromArray($data);
 
             expect($athlete->discipline)->toBe(Discipline::MensArtistic);
+        });
+
+        it('maps gender correctly', function () {
+            $data = loadFixture('athlete.json');
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->gender)->toBe(Gender::Female);
+            expect($athlete->gender->value)->toBe('female');
+        });
+
+        it('handles male gender', function () {
+            $data = loadFixture('athlete.json');
+            $data['Gender'] = 'male';
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->gender)->toBe(Gender::Male);
+        });
+
+        it('handles gender case insensitively', function () {
+            $data = loadFixture('athlete.json');
+            $data['Gender'] = 'FEMALE';
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->gender)->toBe(Gender::Female);
+        });
+
+        it('handles null gender', function () {
+            $data = loadFixture('athlete.json');
+            unset($data['Gender']);
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->gender)->toBeNull();
         });
     });
 

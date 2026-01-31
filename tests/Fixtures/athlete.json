@@ -2,6 +2,7 @@
     "OrgID": "12345",
     "ClubAbbrev": "ABC",
     "ClubName": "ABC Gymnastics",
+    "Gender": "female",
     "InternationalClub": false,
     "MemberID": "987654",
     "LastName": "Smith",

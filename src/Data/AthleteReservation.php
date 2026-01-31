@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AustinW\UsaGym\Data;
 
 use AustinW\UsaGym\Enums\Discipline;
+use AustinW\UsaGym\Enums\Gender;
 use AustinW\UsaGym\Enums\MemberType;
 use AustinW\UsaGym\Enums\MemberStatus;
 use DateTimeImmutable;
@@ -18,6 +19,7 @@ final readonly class AthleteReservation
         public string $orgId,
         public ?string $clubAbbrev,
         public string $clubName,
+        public ?Gender $gender,
         public bool $internationalClub,
         public string $memberId,
         public string $lastName,
@@ -45,6 +47,7 @@ final readonly class AthleteReservation
             orgId: (string) $data['OrgID'],
             clubAbbrev: $data['ClubAbbrev'] ?: null,
             clubName: $data['ClubName'],
+            gender: isset($data['Gender']) ? Gender::tryFromApi($data['Gender']) : null,
             internationalClub: (bool) ($data['InternationalClub'] ?? false),
             memberId: (string) $data['MemberID'],
             lastName: $data['LastName'],
