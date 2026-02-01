@@ -10,7 +10,6 @@
     "api"
   ],
   "license": "MIT",
-  "version": "2.2.0",
   "support": {
     "issues": "https://github.com/austinw/usagym-sdk/issues",
     "source": "https://github.com/austinw/usagym-sdk"
