@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AustinW\UsaGym\Resources;
 
+use AustinW\UsaGym\Concerns\ResolvesDtoOrThrows;
+
 use AustinW\UsaGym\UsaGym;
 use AustinW\UsaGym\Data\VerificationResult;
 use AustinW\UsaGym\Requests\Verification\PersonVerificationRequest;
@@ -15,6 +17,8 @@ use AustinW\UsaGym\Requests\Verification\CoachEmailRequest;
  */
 class VerificationResource
 {
+    use ResolvesDtoOrThrows;
+
     public function __construct(
         protected readonly UsaGym $connector,
         protected readonly int $sanctionId,
@@ -32,7 +36,7 @@ class VerificationResource
             new PersonVerificationRequest($this->sanctionId, 'athlete', $memberIds)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -47,7 +51,7 @@ class VerificationResource
             new PersonVerificationRequest($this->sanctionId, 'coach', $memberIds)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -62,7 +66,7 @@ class VerificationResource
             new PersonVerificationRequest($this->sanctionId, 'judge', $memberIds)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -118,7 +122,7 @@ class VerificationResource
             new CoachEmailRequest($this->sanctionId, $refType, $refTypeId, $email)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -137,6 +141,6 @@ class VerificationResource
             new LegalContactEmailRequest($refType, $refTypeId, $email)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 }

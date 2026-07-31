@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AustinW\UsaGym\Resources;
 
+use AustinW\UsaGym\Concerns\ResolvesDtoOrThrows;
+
 use AustinW\UsaGym\UsaGym;
 use AustinW\UsaGym\Data\DisciplineData;
 use AustinW\UsaGym\Requests\GetDisciplinesRequest;
@@ -13,6 +15,8 @@ use AustinW\UsaGym\Requests\GetDisciplinesRequest;
  */
 class DisciplineResource
 {
+    use ResolvesDtoOrThrows;
+
     public function __construct(
         protected readonly UsaGym $connector,
     ) {}
@@ -26,6 +30,6 @@ class DisciplineResource
     {
         $response = $this->connector->send(new GetDisciplinesRequest());
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 }

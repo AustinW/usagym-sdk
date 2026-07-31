@@ -46,9 +46,21 @@ class UsaGymException extends Exception
      */
     public static function fromResponse(Response $response): self
     {
-        $data = $response->json();
-        $message = $data['message'] ?? 'An API error occurred';
         $status = $response->status();
+
+        // A 500 from this API commonly arrives as text/html with an empty body, so
+        // json() yields null and there is no message to read. Fall back to naming the
+        // status and endpoint, which is the only useful information available.
+        // Saloon types json() as always returning an array, so PHPStan reads this guard
+        // as redundant. It is not: a live 500 from this API returns an empty text/html
+        // body, and json() yields null there. Dropping the check reintroduces a fatal on
+        // exactly the response the caller is trying to diagnose.
+        /** @phpstan-ignore ternary.alwaysTrue */
+        $data = is_array($decoded = $response->json()) ? $decoded : null;
+        $endpoint = $response->getPendingRequest()->getUrl();
+
+        $message = $data['message']
+            ?? sprintf('USA Gymnastics API returned HTTP %d for %s.', $status, $endpoint);
 
         return match ($status) {
             401, 403 => new AuthenticationException($message, $response, $data, $status),
