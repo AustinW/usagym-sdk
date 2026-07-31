@@ -238,7 +238,11 @@ describe('UsaGymException', function () {
             expect($exception->getCode())->toBe(503);
         });
 
-        it('uses default message when response has no message', function () {
+        // The former default was the bare string "An API error occurred", which told a
+        // caller nothing about what failed. Naming the status and endpoint is the point:
+        // a 500 with an empty body has no message field to read, and that is exactly the
+        // case where the caller most needs to know what happened.
+        it('falls back to naming the status and endpoint when the body has no message', function () {
             $mockClient = new MockClient([
                 TestRequest::class => MockResponse::make(['error' => 'Something went wrong'], 500),
             ]);
@@ -247,7 +251,23 @@ describe('UsaGymException', function () {
             $response = $this->connector->send(new TestRequest());
             $exception = UsaGymException::fromResponse($response);
 
-            expect($exception->getMessage())->toBe('An API error occurred');
+            expect($exception->getMessage())
+                ->toContain('HTTP 500')
+                ->toContain('USA Gymnastics API');
+        });
+
+        it('still reports a status when the body is empty and not JSON at all', function () {
+            $mockClient = new MockClient([
+                TestRequest::class => MockResponse::make('', 500, ['Content-Type' => 'text/html']),
+            ]);
+            $this->connector->withMockClient($mockClient);
+
+            $response = $this->connector->send(new TestRequest());
+            $exception = UsaGymException::fromResponse($response);
+
+            expect($exception)->toBeInstanceOf(AustinW\UsaGym\Exceptions\ApiException::class)
+                ->and($exception->getMessage())->toContain('HTTP 500')
+                ->and($exception->getCode())->toBe(500);
         });
 
         it('preserves response data in exception', function () {

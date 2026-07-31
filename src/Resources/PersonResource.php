@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AustinW\UsaGym\Resources;
 
+use AustinW\UsaGym\Concerns\ResolvesDtoOrThrows;
+
 use DateTimeInterface;
 use AustinW\UsaGym\UsaGym;
 use AustinW\UsaGym\Requests\Person\PersonExistsRequest;
@@ -13,6 +15,8 @@ use AustinW\UsaGym\Requests\Person\PersonExistsRequest;
  */
 class PersonResource
 {
+    use ResolvesDtoOrThrows;
+
     public function __construct(
         protected readonly UsaGym $connector,
     ) {}
@@ -34,6 +38,6 @@ class PersonResource
             new PersonExistsRequest($memberId, $lastName, $dateOfBirth)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 }

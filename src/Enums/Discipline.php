@@ -14,7 +14,7 @@ enum Discipline: string
     case GymnasticsForAll = 'GFA';
 
     /**
-     * Get the short display name
+     * Get the short display name.
      */
     public function name(): string
     {
@@ -29,7 +29,7 @@ enum Discipline: string
     }
 
     /**
-     * Get the full display name
+     * Get the full display name.
      */
     public function fullName(): string
     {
@@ -44,7 +44,7 @@ enum Discipline: string
     }
 
     /**
-     * Create from API response value (handles both code and display name)
+     * Create from API response value (handles both code and display name).
      */
     public static function fromApi(string $value): self
     {
@@ -67,7 +67,7 @@ enum Discipline: string
     }
 
     /**
-     * Get the level enum class for this discipline
+     * Get the level enum class for this discipline.
      */
     public function levelEnumClass(): string
     {
@@ -78,6 +78,20 @@ enum Discipline: string
             self::Acrobatic => Levels\AcrobaticLevel::class,
             self::Trampoline => Levels\TrampolineLevel::class,
             self::GymnasticsForAll => Levels\GfaLevel::class,
+        };
+    }
+
+    /**
+     * Get the apparatus enum class for this discipline, or null where the API's
+     * apparatus vocabulary is not a closed set we can model.
+     *
+     * @return class-string|null
+     */
+    public function apparatusEnumClass(): ?string
+    {
+        return match ($this) {
+            self::Trampoline => Apparatus\TrampolineApparatus::class,
+            default => null,
         };
     }
 }

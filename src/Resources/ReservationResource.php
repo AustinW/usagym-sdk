@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AustinW\UsaGym\Resources;
 
+use AustinW\UsaGym\Concerns\ResolvesDtoOrThrows;
+
 use BackedEnum;
 use Saloon\Http\Pool;
 use AustinW\UsaGym\UsaGym;
@@ -24,6 +26,8 @@ use AustinW\UsaGym\Requests\Reservations\GetIndividualsRequest;
  */
 class ReservationResource
 {
+    use ResolvesDtoOrThrows;
+
     public function __construct(
         protected readonly UsaGym $connector,
         protected readonly int $sanctionId,
@@ -42,7 +46,7 @@ class ReservationResource
             new GetAthletesRequest($this->sanctionId, $clubs, $levels)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -57,7 +61,7 @@ class ReservationResource
             new GetCoachesRequest($this->sanctionId, $clubs)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -71,7 +75,7 @@ class ReservationResource
             new GetJudgesRequest($this->sanctionId)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -92,7 +96,7 @@ class ReservationResource
             return [];
         }
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -108,7 +112,7 @@ class ReservationResource
             new GetGroupsRequest($this->sanctionId, $clubs, $levels)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -124,7 +128,7 @@ class ReservationResource
             new GetIndividualsRequest($this->sanctionId, $clubs, $levels)
         );
 
-        return $response->dtoOrFail();
+        return $this->resolveDto($response);
     }
 
     /**
@@ -174,7 +178,7 @@ class ReservationResource
             requests: $requests(),
             concurrency: $concurrency,
             responseHandler: function ($response) use (&$allAthletes) {
-                $athletes = $response->dtoOrFail();
+                $athletes = $this->resolveDto($response);
                 array_push($allAthletes, ...$athletes);
             },
             exceptionHandler: function ($exception, $request) {
