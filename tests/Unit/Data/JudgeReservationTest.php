@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use AustinW\UsaGym\Data\JudgeReservation;
 use AustinW\UsaGym\Enums\Discipline;
-use AustinW\UsaGym\Enums\MemberStatus;
 use AustinW\UsaGym\Enums\MemberType;
+use AustinW\UsaGym\Enums\MemberStatus;
+use AustinW\UsaGym\Data\JudgeReservation;
 
 describe('JudgeReservation', function () {
     describe('fromArray', function () {
@@ -57,6 +57,62 @@ describe('JudgeReservation', function () {
         it('handles empty certifications', function () {
             $data = loadFixture('judge.json');
             unset($data['Certification']);
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->certifications)->toBe([]);
+        });
+
+        /**
+         * Live T&T sanctions send `"Certification": [null, null, null]` — the key is
+         * present but carries nothing. Passed through, it made `certifications` report a
+         * count of 3 for a judge holding none, and fataled any consumer mapping it through
+         * a string-typed callable. The declared array<string> has to be true at runtime or
+         * static analysis blesses both bugs.
+         */
+        it('drops nulls so a placeholder array does not read as held certifications', function () {
+            $data = loadFixture('judge.json');
+            $data['Certification'] = [null, null, null];
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->certifications)->toBe([])
+                ->and($judge->certifications)->toHaveCount(0);
+        });
+
+        it('keeps the real codes from a partially populated array', function () {
+            $data = loadFixture('judge.json');
+            $data['Certification'] = ['TRC2', null, 'DMC1'];
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->certifications)->toBe(['TRC2', 'DMC1']);
+        });
+
+        it('reindexes so the result is a list rather than a sparse array', function () {
+            $data = loadFixture('judge.json');
+            $data['Certification'] = [null, 'TRC2'];
+            $judge = JudgeReservation::fromArray($data);
+
+            expect(array_keys($judge->certifications))->toBe([0]);
+        });
+
+        it('drops empty and whitespace-only codes', function () {
+            $data = loadFixture('judge.json');
+            $data['Certification'] = ['', '   ', 'TRC2'];
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->certifications)->toBe(['TRC2']);
+        });
+
+        it('drops non-string scalars rather than coercing them', function () {
+            $data = loadFixture('judge.json');
+            $data['Certification'] = [123, true, 'TRC2'];
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->certifications)->toBe(['TRC2']);
+        });
+
+        it('tolerates a non-array Certification value', function () {
+            $data = loadFixture('judge.json');
+            $data['Certification'] = null;
             $judge = JudgeReservation::fromArray($data);
 
             expect($judge->certifications)->toBe([]);
