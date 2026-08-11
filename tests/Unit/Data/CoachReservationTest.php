@@ -115,6 +115,34 @@ describe('CoachReservation', function () {
             expect($coach->discipline)->toBe(Discipline::Trampoline);
         });
 
+        it('degrades an unrecognized member type to null while preserving the raw code', function () {
+            $data = loadFixture('coach.json');
+            $data['MemberType'] = 'SOMENEWMEMBERTYPE';
+            $coach = CoachReservation::fromArray($data);
+
+            expect($coach->memberType)->toBeNull();
+            expect($coach->memberTypeRaw)->toBe('SOMENEWMEMBERTYPE');
+            expect($coach->lastName)->toBe('Williams');
+        });
+
+        it('degrades an unrecognized status to null while preserving the raw code', function () {
+            $data = loadFixture('coach.json');
+            $data['Status'] = 'Deceased';
+            $coach = CoachReservation::fromArray($data);
+
+            expect($coach->status)->toBeNull();
+            expect($coach->statusRaw)->toBe('Deceased');
+            expect($coach->lastName)->toBe('Williams');
+        });
+
+        it('preserves the raw member type and status even when recognized', function () {
+            $data = loadFixture('coach.json');
+            $coach = CoachReservation::fromArray($data);
+
+            expect($coach->memberTypeRaw)->toBe('CCOACH');
+            expect($coach->statusRaw)->toBe('Active');
+        });
+
         it('handles different member statuses', function () {
             $statuses = [
                 'Active' => MemberStatus::Active,

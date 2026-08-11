@@ -22,15 +22,17 @@ final readonly class JudgeReservation
         public string $lastName,
         public string $firstName,
         public Discipline $discipline,
-        public MemberType $memberType,
+        public ?MemberType $memberType,
         public bool $internationalMember,
-        public MemberStatus $status,
+        public ?MemberStatus $status,
         public ?DateTimeImmutable $registrationDate,
         public string $level,
         public bool $scratched,
         public ?DateTimeImmutable $scratchDate,
         public ?DateTimeImmutable $modifiedDate,
         public array $certifications,
+        public ?string $memberTypeRaw,
+        public ?string $statusRaw,
     ) {}
 
     /**
@@ -43,15 +45,17 @@ final readonly class JudgeReservation
             lastName: $data['LastName'],
             firstName: $data['FirstName'],
             discipline: Discipline::fromApi($data['Discipline']),
-            memberType: MemberType::from($data['MemberType']),
+            memberType: MemberType::tryFrom($data['MemberType']),
             internationalMember: (bool) ($data['InternationalMember'] ?? false),
-            status: MemberStatus::from($data['Status']),
+            status: MemberStatus::tryFrom($data['Status']),
             registrationDate: self::parseDateTime($data['RegDate'] ?? null),
             level: $data['Level'] ?? 'Judge',
             scratched: (bool) ($data['Scratched'] ?? false),
             scratchDate: self::parseDateTime($data['ScratchDate'] ?? null),
             modifiedDate: self::parseDateTime($data['ModifiedDate'] ?? null),
             certifications: self::parseCertifications($data['Certification'] ?? []),
+            memberTypeRaw: $data['MemberType'],
+            statusRaw: $data['Status'],
         );
     }
 

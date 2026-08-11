@@ -172,7 +172,7 @@ describe('DisciplineData', function () {
             }
         });
 
-        it('throws exception for invalid code', function () {
+        it('returns null for invalid code instead of throwing', function () {
             $data = [
                 'Code' => 'INVALID',
                 'Name' => 'Invalid',
@@ -180,7 +180,8 @@ describe('DisciplineData', function () {
             ];
             $discipline = DisciplineData::fromArray($data);
 
-            expect(fn() => $discipline->toEnum())->toThrow(ValueError::class);
+            expect($discipline->toEnum())->toBeNull();
+            expect($discipline->code)->toBe('INVALID');
         });
     });
 

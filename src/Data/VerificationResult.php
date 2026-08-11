@@ -33,7 +33,7 @@ final readonly class VerificationResult
         public array $clubNames,
         public array $clubStatuses,
         public array $internationalClubs,
-        public MemberType $memberType,
+        public ?MemberType $memberType,
         public array $disciplines,
         public ?string $level,
         public bool $internationalMember,
@@ -41,6 +41,7 @@ final readonly class VerificationResult
         public ?string $ineligibleReason,
         public ?bool $certificationValid,
         public ?array $certificationLevels,
+        public ?string $memberTypeRaw,
     ) {}
 
     /**
@@ -59,7 +60,7 @@ final readonly class VerificationResult
             clubNames: $data['ClubName'] ?? [],
             clubStatuses: $data['ClubStatus'] ?? [],
             internationalClubs: $data['InternationalClub'] ?? [],
-            memberType: MemberType::from($data['MemberType']),
+            memberType: MemberType::tryFrom($data['MemberType']),
             disciplines: $data['Discipline'] ?? [],
             level: $data['Level'] ?? null,
             internationalMember: ($data['InternationalMember'] ?? 'No') === 'Yes',
@@ -69,6 +70,7 @@ final readonly class VerificationResult
                 ? (bool) $data['Certification']['valid']
                 : null,
             certificationLevels: $data['Certification']['levels'] ?? null,
+            memberTypeRaw: $data['MemberType'],
         );
     }
 

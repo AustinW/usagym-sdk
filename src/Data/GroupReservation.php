@@ -25,7 +25,7 @@ final readonly class GroupReservation
         public string $groupName,
         public string $groupType,
         public Discipline $discipline,
-        public MemberStatus $status,
+        public ?MemberStatus $status,
         public ?DateTimeImmutable $registrationDate,
         public ?string $apparatus,
         public string $level,
@@ -34,6 +34,7 @@ final readonly class GroupReservation
         public bool $scratched,
         public ?DateTimeImmutable $scratchDate,
         public ?DateTimeImmutable $modifiedDate,
+        public ?string $statusRaw,
     ) {}
 
     /**
@@ -55,7 +56,7 @@ final readonly class GroupReservation
             groupName: $data['GroupName'],
             groupType: $data['GroupType'],
             discipline: Discipline::fromApi($data['Discipline']),
-            status: MemberStatus::from($data['Status']),
+            status: MemberStatus::tryFrom($data['Status']),
             registrationDate: self::parseDateTime($data['RegDate'] ?? null),
             apparatus: $data['Apparatus'] ?? null,
             level: $data['Level'],
@@ -64,6 +65,7 @@ final readonly class GroupReservation
             scratched: (bool) ($data['Scratched'] ?? false),
             scratchDate: self::parseDateTime($data['ScratchDate'] ?? null),
             modifiedDate: self::parseDateTime($data['ModifiedDate'] ?? null),
+            statusRaw: $data['Status'],
         );
     }
 
@@ -80,7 +82,7 @@ final readonly class GroupReservation
      */
     public function canCompete(): bool
     {
-        return $this->status->canParticipate() && !$this->scratched;
+        return ($this->status?->canParticipate() ?? false) && !$this->scratched;
     }
 
     private static function parseDateTime(?string $value): ?DateTimeImmutable

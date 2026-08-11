@@ -111,6 +111,34 @@ describe('AthleteReservation', function () {
             expect($athlete->status->value)->toBe('Active');
         });
 
+        it('degrades an unrecognized member type to null while preserving the raw code', function () {
+            $data = loadFixture('athlete.json');
+            $data['MemberType'] = 'SOMENEWMEMBERTYPE';
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->memberType)->toBeNull();
+            expect($athlete->memberTypeRaw)->toBe('SOMENEWMEMBERTYPE');
+            expect($athlete->lastName)->toBe('Smith');
+        });
+
+        it('degrades an unrecognized status to null while preserving the raw code', function () {
+            $data = loadFixture('athlete.json');
+            $data['Status'] = 'Deceased';
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->status)->toBeNull();
+            expect($athlete->statusRaw)->toBe('Deceased');
+            expect($athlete->lastName)->toBe('Smith');
+        });
+
+        it('preserves the raw member type and status even when recognized', function () {
+            $data = loadFixture('athlete.json');
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->memberTypeRaw)->toBe('ATHL');
+            expect($athlete->statusRaw)->toBe('Active');
+        });
+
         it('handles discipline from display name', function () {
             $data = loadFixture('athlete.json');
             $data['Discipline'] = 'Women';
@@ -232,6 +260,15 @@ describe('AthleteReservation', function () {
             $data['Scratched'] = true;
             $athlete = AthleteReservation::fromArray($data);
 
+            expect($athlete->canCompete())->toBeFalse();
+        });
+
+        it('returns false when status is unrecognized', function () {
+            $data = loadFixture('athlete.json');
+            $data['Status'] = 'SomeNewStatusUsagAddedLater';
+            $athlete = AthleteReservation::fromArray($data);
+
+            expect($athlete->status)->toBeNull();
             expect($athlete->canCompete())->toBeFalse();
         });
     });

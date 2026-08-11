@@ -30,10 +30,11 @@ final readonly class DisciplineData
     }
 
     /**
-     * Get the corresponding Discipline enum
+     * Get the corresponding Discipline enum, or null if the API returned a
+     * code this SDK doesn't model.
      */
-    public function toEnum(): Discipline
+    public function toEnum(): ?Discipline
     {
-        return Discipline::from($this->code);
+        return Discipline::tryFrom($this->code);
     }
 }

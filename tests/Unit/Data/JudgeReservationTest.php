@@ -152,6 +152,34 @@ describe('JudgeReservation', function () {
             expect($judge->status->value)->toBe('Active');
         });
 
+        it('degrades an unrecognized member type to null while preserving the raw code', function () {
+            $data = loadFixture('judge.json');
+            $data['MemberType'] = 'SOMENEWMEMBERTYPE';
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->memberType)->toBeNull();
+            expect($judge->memberTypeRaw)->toBe('SOMENEWMEMBERTYPE');
+            expect($judge->lastName)->toBe('Davis');
+        });
+
+        it('degrades an unrecognized status to null while preserving the raw code', function () {
+            $data = loadFixture('judge.json');
+            $data['Status'] = 'Deceased';
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->status)->toBeNull();
+            expect($judge->statusRaw)->toBe('Deceased');
+            expect($judge->lastName)->toBe('Davis');
+        });
+
+        it('preserves the raw member type and status even when recognized', function () {
+            $data = loadFixture('judge.json');
+            $judge = JudgeReservation::fromArray($data);
+
+            expect($judge->memberTypeRaw)->toBe('JUDGE');
+            expect($judge->statusRaw)->toBe('Active');
+        });
+
         it('handles different disciplines', function () {
             $disciplines = [
                 'Women' => Discipline::WomensArtistic,
