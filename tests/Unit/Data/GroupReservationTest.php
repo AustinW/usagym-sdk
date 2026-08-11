@@ -118,6 +118,23 @@ describe('GroupReservation', function () {
             expect($group->status->value)->toBe('Active');
         });
 
+        it('degrades an unrecognized status to null while preserving the raw code', function () {
+            $data = loadFixture('group.json');
+            $data['Status'] = 'Deceased';
+            $group = GroupReservation::fromArray($data);
+
+            expect($group->status)->toBeNull();
+            expect($group->statusRaw)->toBe('Deceased');
+            expect($group->groupName)->toBe('ABC Junior Group');
+        });
+
+        it('preserves the raw status even when recognized', function () {
+            $data = loadFixture('group.json');
+            $group = GroupReservation::fromArray($data);
+
+            expect($group->statusRaw)->toBe('Active');
+        });
+
         it('handles discipline from display name', function () {
             $data = loadFixture('group.json');
             $data['Discipline'] = 'Acro';
@@ -218,6 +235,15 @@ describe('GroupReservation', function () {
             $data['Scratched'] = true;
             $group = GroupReservation::fromArray($data);
 
+            expect($group->canCompete())->toBeFalse();
+        });
+
+        it('returns false when status is unrecognized', function () {
+            $data = loadFixture('group.json');
+            $data['Status'] = 'SomeNewStatusUsagAddedLater';
+            $group = GroupReservation::fromArray($data);
+
+            expect($group->status)->toBeNull();
             expect($group->canCompete())->toBeFalse();
         });
     });

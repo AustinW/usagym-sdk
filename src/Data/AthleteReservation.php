@@ -26,9 +26,9 @@ final readonly class AthleteReservation
         public string $firstName,
         public ?DateTimeImmutable $dateOfBirth,
         public Discipline $discipline,
-        public MemberType $memberType,
+        public ?MemberType $memberType,
         public bool $internationalMember,
-        public MemberStatus $status,
+        public ?MemberStatus $status,
         public ?DateTimeImmutable $registrationDate,
         public ?string $apparatus,
         public string $level,
@@ -36,6 +36,8 @@ final readonly class AthleteReservation
         public bool $scratched,
         public ?DateTimeImmutable $scratchDate,
         public ?DateTimeImmutable $modifiedDate,
+        public ?string $memberTypeRaw,
+        public ?string $statusRaw,
     ) {}
 
     /**
@@ -54,9 +56,9 @@ final readonly class AthleteReservation
             firstName: $data['FirstName'],
             dateOfBirth: self::parseDate($data['DOB'] ?? null, 'm/d/Y'),
             discipline: Discipline::fromApi($data['Discipline']),
-            memberType: MemberType::from($data['MemberType']),
+            memberType: MemberType::tryFrom($data['MemberType']),
             internationalMember: (bool) ($data['InternationalMember'] ?? false),
-            status: MemberStatus::from($data['Status']),
+            status: MemberStatus::tryFrom($data['Status']),
             registrationDate: self::parseDateTime($data['RegDate'] ?? null),
             apparatus: $data['Apparatus'] ?? null,
             level: $data['Level'],
@@ -64,6 +66,8 @@ final readonly class AthleteReservation
             scratched: (bool) ($data['Scratched'] ?? false),
             scratchDate: self::parseDateTime($data['ScratchDate'] ?? null),
             modifiedDate: self::parseDateTime($data['ModifiedDate'] ?? null),
+            memberTypeRaw: $data['MemberType'],
+            statusRaw: $data['Status'],
         );
     }
 
@@ -80,7 +84,7 @@ final readonly class AthleteReservation
      */
     public function canCompete(): bool
     {
-        return $this->status->canParticipate() && !$this->scratched;
+        return ($this->status?->canParticipate() ?? false) && !$this->scratched;
     }
 
     private static function parseDate(?string $value, string $format = 'Y-m-d'): ?DateTimeImmutable

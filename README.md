@@ -230,7 +230,8 @@ $athlete->fullName();        // "John Doe"
 $athlete->dateOfBirth;       // DateTimeImmutable
 $athlete->discipline;        // Discipline enum
 $athlete->level;             // "Gold"
-$athlete->status;            // MemberStatus enum
+$athlete->status;            // ?MemberStatus enum — null if USAG returns a code this SDK doesn't model
+$athlete->statusRaw;         // string — the raw API value, always populated
 $athlete->canCompete();      // bool
 
 // ClubReservation

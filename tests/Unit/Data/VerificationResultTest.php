@@ -180,6 +180,23 @@ describe('VerificationResult', function () {
 
             expect($result->memberType)->toBe(MemberType::Judge);
         });
+
+        it('degrades an unrecognized member type to null while preserving the raw code', function () {
+            $data = loadFixture('verification.json');
+            $data['MemberType'] = 'SOMENEWMEMBERTYPE';
+            $result = VerificationResult::fromArray($data);
+
+            expect($result->memberType)->toBeNull();
+            expect($result->memberTypeRaw)->toBe('SOMENEWMEMBERTYPE');
+            expect($result->lastName)->toBe('Smith');
+        });
+
+        it('preserves the raw member type even when recognized', function () {
+            $data = loadFixture('verification.json');
+            $result = VerificationResult::fromArray($data);
+
+            expect($result->memberTypeRaw)->toBe('ATHL');
+        });
     });
 
     describe('fullName', function () {
