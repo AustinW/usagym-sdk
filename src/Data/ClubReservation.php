@@ -37,16 +37,24 @@ final readonly class ClubReservation
             clubName: $data['ClubName'],
             clubCity: ($data['ClubCity'] ?? null) ?: null,
             clubState: ($data['ClubState'] ?? null) ?: null,
-            clubContactId: ($data['ClubContactID'] ?? null) ?: null,
+            clubContactId: self::nullableId($data['ClubContactID'] ?? null),
             clubContactName: $data['ClubContactName'] ?? $data['ClubContact'] ?? null,
             clubContactEmail: ($data['ClubContactEmail'] ?? null) ?: null,
             clubContactPhone: ($data['ClubContactPhone'] ?? null) ?: null,
-            meetContactId: ($data['MeetContactID'] ?? null) ?: null,
+            meetContactId: self::nullableId($data['MeetContactID'] ?? null),
             meetContactName: ($data['MeetContactName'] ?? null) ?: null,
             meetContactEmail: ($data['MeetContactEmail'] ?? null) ?: null,
             meetContactPhone: ($data['MeetContactPhone'] ?? null) ?: null,
             internationalClub: (bool) ($data['InternationalClub'] ?? false),
         );
+    }
+
+    /**
+     * USAG returns contact IDs as either strings or integers depending on the endpoint.
+     */
+    private static function nullableId(mixed $value): ?string
+    {
+        return $value ? (string) $value : null;
     }
 
     /**
