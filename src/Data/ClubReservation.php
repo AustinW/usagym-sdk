@@ -31,30 +31,33 @@ final readonly class ClubReservation
      */
     public static function fromArray(array $data): self
     {
+        $clubContactName = $data['ClubContactName'] ?? $data['ClubContact'] ?? null;
+
         return new self(
             clubId: (string) $data['ClubID'],
-            clubAbbrev: ($data['ClubAbbrev'] ?? null) ?: null,
-            clubName: $data['ClubName'],
-            clubCity: ($data['ClubCity'] ?? null) ?: null,
-            clubState: ($data['ClubState'] ?? null) ?: null,
-            clubContactId: self::nullableId($data['ClubContactID'] ?? null),
-            clubContactName: $data['ClubContactName'] ?? $data['ClubContact'] ?? null,
-            clubContactEmail: ($data['ClubContactEmail'] ?? null) ?: null,
-            clubContactPhone: ($data['ClubContactPhone'] ?? null) ?: null,
-            meetContactId: self::nullableId($data['MeetContactID'] ?? null),
-            meetContactName: ($data['MeetContactName'] ?? null) ?: null,
-            meetContactEmail: ($data['MeetContactEmail'] ?? null) ?: null,
-            meetContactPhone: ($data['MeetContactPhone'] ?? null) ?: null,
+            clubAbbrev: self::nullableString($data['ClubAbbrev'] ?? null),
+            clubName: (string) $data['ClubName'],
+            clubCity: self::nullableString($data['ClubCity'] ?? null),
+            clubState: self::nullableString($data['ClubState'] ?? null),
+            clubContactId: self::nullableString($data['ClubContactID'] ?? null),
+            clubContactName: is_scalar($clubContactName) ? (string) $clubContactName : null,
+            clubContactEmail: self::nullableString($data['ClubContactEmail'] ?? null),
+            clubContactPhone: self::nullableString($data['ClubContactPhone'] ?? null),
+            meetContactId: self::nullableString($data['MeetContactID'] ?? null),
+            meetContactName: self::nullableString($data['MeetContactName'] ?? null),
+            meetContactEmail: self::nullableString($data['MeetContactEmail'] ?? null),
+            meetContactPhone: self::nullableString($data['MeetContactPhone'] ?? null),
             internationalClub: (bool) ($data['InternationalClub'] ?? false),
         );
     }
 
     /**
-     * USAG returns contact IDs as either strings or integers depending on the endpoint.
+     * USAG returns IDs and phone numbers as either strings or JSON numbers, so cast any
+     * scalar to string. Empty values ('', null, 0) stay null, as before.
      */
-    private static function nullableId(mixed $value): ?string
+    private static function nullableString(mixed $value): ?string
     {
-        return $value ? (string) $value : null;
+        return $value && is_scalar($value) ? (string) $value : null;
     }
 
     /**

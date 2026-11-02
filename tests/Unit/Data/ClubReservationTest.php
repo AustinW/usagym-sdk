@@ -102,6 +102,39 @@ describe('ClubReservation', function () {
             expect($club->meetContactId)->toBe('222');
         });
 
+        it('casts integer phone numbers to strings', function () {
+            // Live USAG shape (sanction 96446, 2026-11): IDs, phones and the flag are all JSON numbers.
+            $data = loadFixture('club.json');
+            $data['ClubID'] = 12345;
+            $data['ClubContactID'] = 111;
+            $data['ClubContactPhone'] = 5551234567;
+            $data['MeetContactID'] = 222;
+            $data['MeetContactPhone'] = 5559876543;
+            $data['InternationalClub'] = 0;
+            $club = ClubReservation::fromArray($data);
+
+            expect($club->clubId)->toBe('12345');
+            expect($club->clubContactPhone)->toBe('5551234567');
+            expect($club->meetContactPhone)->toBe('5559876543');
+            expect($club->internationalClub)->toBeFalse();
+        });
+
+        it('casts any numeric text field to a string', function () {
+            $data = loadFixture('club.json');
+            $data['ClubAbbrev'] = 123;
+            $data['ClubName'] = 456;
+            $data['ClubCity'] = 789;
+            $data['ClubContactName'] = 1;
+            $data['MeetContactName'] = 2;
+            $club = ClubReservation::fromArray($data);
+
+            expect($club->clubAbbrev)->toBe('123');
+            expect($club->clubName)->toBe('456');
+            expect($club->clubCity)->toBe('789');
+            expect($club->clubContactName)->toBe('1');
+            expect($club->meetContactName)->toBe('2');
+        });
+
         it('handles ClubContact as fallback for ClubContactName', function () {
             $data = loadFixture('club.json');
             unset($data['ClubContactName']);
