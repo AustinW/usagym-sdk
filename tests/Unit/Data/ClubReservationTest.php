@@ -92,6 +92,16 @@ describe('ClubReservation', function () {
             expect($club->meetContactPhone)->toBeNull();
         });
 
+        it('casts integer contact IDs to strings', function () {
+            $data = loadFixture('club.json');
+            $data['ClubContactID'] = 111;
+            $data['MeetContactID'] = 222;
+            $club = ClubReservation::fromArray($data);
+
+            expect($club->clubContactId)->toBe('111');
+            expect($club->meetContactId)->toBe('222');
+        });
+
         it('handles ClubContact as fallback for ClubContactName', function () {
             $data = loadFixture('club.json');
             unset($data['ClubContactName']);
