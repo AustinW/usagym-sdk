@@ -19,6 +19,19 @@ describe('ClubReservation', function () {
             expect($club->internationalClub)->toBeFalse();
         });
 
+        it('coerces integer contact ids from the API to strings', function () {
+            $data = array_merge(loadFixture('club.json'), [
+                'ClubContactID' => 111,
+                'MeetContactID' => 222,
+                'ClubContactPhone' => 5551234567,
+            ]);
+            $club = ClubReservation::fromArray($data);
+
+            expect($club->clubContactId)->toBe('111');
+            expect($club->meetContactId)->toBe('222');
+            expect($club->clubContactPhone)->toBe('5551234567');
+        });
+
         it('parses club contact information', function () {
             $data = loadFixture('club.json');
             $club = ClubReservation::fromArray($data);
